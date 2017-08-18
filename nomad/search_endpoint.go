@@ -116,10 +116,8 @@ func (s *Search) PrefixSearch(args *structs.SearchRequest,
 			for _, ctx := range contexts {
 				iter, err := getResourceIter(ctx, roundUUIDDownIfOdd(args.Prefix, args.Context), ws, state)
 
-				// When searching all Contexts, Job ids will cause errors when searched
-				// in the context of allocs, nodes, and/or evals.
 				if err != nil {
-					s.srv.logger.Printf("[WARN] nomad.resources: error when searching context %s for id %s", ctx, args.Prefix)
+					return err
 				} else {
 					iters[ctx] = iter
 				}
@@ -137,7 +135,7 @@ func (s *Search) PrefixSearch(args *structs.SearchRequest,
 			// maximum index from all resources will be used.
 			for _, ctx := range contexts {
 				index, err := state.Index(string(ctx))
-				if err != nil {
+				if err != nil && !strings.Contains(err.Error(), "invalid UUID: encoding/hex: invalid byte") {
 					return err
 				}
 				if index > reply.Index {
