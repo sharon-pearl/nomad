@@ -159,6 +159,6 @@ func TestClient_ACL_resolveToken(t *testing.T) {
 
 	// Test bad token
 	out4, err := c1.resolveToken(structs.GenerateUUID())
-	assert.Equal(t, structs.TokenNotFound, err)
+	assert.Equal(t, structs.ErrTokenNotFound, err)
 	assert.Nil(t, out4)
 }
